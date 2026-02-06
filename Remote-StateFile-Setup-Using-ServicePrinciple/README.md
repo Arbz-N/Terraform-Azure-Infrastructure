@@ -63,7 +63,7 @@ Step 2 — Create Remote State Storage (Using CLI or Terraform)
       --encryption-services blob
     
     # Create blob container
-    az storage container create 
+    az storage container create \
       --name $CONTAINER_NAME \
       --account-name $STORAGE_ACCOUNT_NAME
     
