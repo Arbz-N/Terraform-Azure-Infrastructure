@@ -73,7 +73,7 @@ Step 3 — Terraform Provider Configuration
 
     Terraform uses the Service Principal credentials:
     
-    provider "azurerm" 
+    provider "azurerm" {
       features {}
     
       subscription_id = "<SUBSCRIPTION_ID>"
