@@ -22,7 +22,7 @@ Before starting, ensure you have:
     Terraform v1.9+ installed
     Permissions to create:
     
-    Azure AD Service Principals
+    Azure AD Service Principals  #to create azure resources
     Resource Groups
     Storage Accounts
 
