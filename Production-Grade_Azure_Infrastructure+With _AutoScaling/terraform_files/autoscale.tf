@@ -15,7 +15,7 @@ resource "azurerm_monitor_autoscale_setting" "autoscale" {
       maximum = 10
     }
 
-    # ⬇️ SCALE IN RULE (Decrease VMs)
+    # ⬇ SCALE IN RULE (Decrease VMs)
     rule {
       metric_trigger {
         metric_name        = "Percentage CPU"
@@ -36,7 +36,7 @@ resource "azurerm_monitor_autoscale_setting" "autoscale" {
       }
     }
 
-    # ⬆️ SCALE OUT RULE (Recommended, warna sirf decrease karega)
+    # ⬆ SCALE OUT RULE (Increase VMs)
     rule {
       metric_trigger {
         metric_name        = "Percentage CPU"
