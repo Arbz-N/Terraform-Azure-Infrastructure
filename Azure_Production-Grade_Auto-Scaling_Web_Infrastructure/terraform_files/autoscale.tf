@@ -3,7 +3,7 @@ resource "azurerm_monitor_autoscale_setting" "autoscale" {
   name                = "vmss-autoscale"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  target_resource_id  = azurerm_orchestrated_virtual_machine_scale_set.vmss_terraform_tutorial.id
+  target_resource_id  = azurerm_orchestrated_virtual_machine_scale_set.vmss.id
   enabled             = true
 
   profile {
@@ -19,7 +19,7 @@ resource "azurerm_monitor_autoscale_setting" "autoscale" {
     rule {
       metric_trigger {
         metric_name        = "Percentage CPU"
-        metric_resource_id = azurerm_orchestrated_virtual_machine_scale_set.vmss_terraform_tutorial.id
+        metric_resource_id = azurerm_orchestrated_virtual_machine_scale_set.vmss.id
         time_grain         = "PT1M"   # metric every 1 min
         statistic          = "Average"
         time_window        = "PT2M"   # for 2 minutes
@@ -40,7 +40,7 @@ resource "azurerm_monitor_autoscale_setting" "autoscale" {
     rule {
       metric_trigger {
         metric_name        = "Percentage CPU"
-        metric_resource_id = azurerm_orchestrated_virtual_machine_scale_set.vmss_terraform_tutorial.id
+        metric_resource_id = azurerm_orchestrated_virtual_machine_scale_set.vmss.id
         time_grain         = "PT1M"
         statistic          = "Average"
         time_window        = "PT5M"
