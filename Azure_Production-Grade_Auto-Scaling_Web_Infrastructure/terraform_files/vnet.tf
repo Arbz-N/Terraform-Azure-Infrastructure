@@ -78,7 +78,7 @@ resource "azurerm_subnet_network_security_group_association" "nsg_assoc" {
   subnet_id                 = azurerm_subnet.subnet.id
 }
 
-# 🔵 Public IP for Load Balancer
+#  Public IP for Load Balancer
 resource "azurerm_public_ip" "lb_pip" {
   allocation_method   = "Static"
   location            = azurerm_resource_group.rg.location
@@ -125,7 +125,7 @@ resource "azurerm_lb_rule" "http_rule" {
   probe_id                       = azurerm_lb_probe.probe.id
 }
 
-# 🔵 Public IP for NAT Gateway
+#  Public IP for NAT Gateway
 resource "azurerm_public_ip" "natgw_pip" {
   name                = "<NATGW_PUBLIC_IP_NAME>"
   location            = azurerm_resource_group.rg.location
