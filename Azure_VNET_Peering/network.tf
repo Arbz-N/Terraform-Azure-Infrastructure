@@ -1,46 +1,46 @@
-resource "azurerm_resource_group" "r-group" {
-  location = "australiaeast"
-  name     = "practice"
+resource "azurerm_resource_group" "rg" {
+  location = "<REGION>"
+  name     = "<RESOURCE_GROUP_NAME>"
 }
 
 resource "azurerm_virtual_network" "vnet1" {
-  location            = azurerm_resource_group.r-group.location
-  name                = "vnet-1"
-  resource_group_name = azurerm_resource_group.r-group.name
-  address_space = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.rg.location
+  name                = "<VNET1_NAME>"
+  resource_group_name = azurerm_resource_group.rg.name
+  address_space       = ["<VNET1_ADDRESS_SPACE>"]   # e.g. 10.0.0.0/16
 }
 
-resource "azurerm_subnet" "subnet-1" {
-  address_prefixes = ["10.0.0.0/24"]
-  name                 = "subnet-peer1"
-  resource_group_name  = azurerm_resource_group.r-group.name
+resource "azurerm_subnet" "subnet1" {
+  address_prefixes     = ["<SUBNET1_PREFIX>"]       # e.g. 10.0.0.0/24
+  name                 = "<SUBNET1_NAME>"
+  resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet1.name
 }
 
 resource "azurerm_virtual_network" "vnet2" {
-  location            = azurerm_resource_group.r-group.location
-  name                = "vnet-2"
-  resource_group_name = azurerm_resource_group.r-group.name
-  address_space = ["10.1.0.0/16"]
+  location            = azurerm_resource_group.rg.location
+  name                = "<VNET2_NAME>"
+  resource_group_name = azurerm_resource_group.rg.name
+  address_space       = ["<VNET2_ADDRESS_SPACE>"]   # e.g. 10.1.0.0/16
 }
 
-resource "azurerm_subnet" "subnet-2" {
-  address_prefixes = ["10.0.1.0/24"]
-  name                 = "subnet-peer1"
-  resource_group_name  = azurerm_resource_group.r-group.name
+resource "azurerm_subnet" "subnet2" {
+  address_prefixes     = ["<SUBNET2_PREFIX>"]       # e.g. 10.1.0.0/24
+  name                 = "<SUBNET2_NAME>"
+  resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet2.name
 }
-resource "azurerm_virtual_network_peering" "peering-1" {
-  name                      = "peeringVnet-1-to-2"
+
+resource "azurerm_virtual_network_peering" "vnet1_to_vnet2" {
+  name                      = "<PEERING_NAME_1>"
   remote_virtual_network_id = azurerm_virtual_network.vnet2.id
-  resource_group_name       = azurerm_resource_group.r-group.name
+  resource_group_name       = azurerm_resource_group.rg.name
   virtual_network_name      = azurerm_virtual_network.vnet1.name
 }
 
-resource "azurerm_virtual_network_peering" "peering-2" {
-  name                      = "peeringVnet-2-to-1"
+resource "azurerm_virtual_network_peering" "vnet2_to_vnet1" {
+  name                      = "<PEERING_NAME_2>"
   remote_virtual_network_id = azurerm_virtual_network.vnet1.id
-  resource_group_name       = azurerm_resource_group.r-group.name
+  resource_group_name       = azurerm_resource_group.rg.name
   virtual_network_name      = azurerm_virtual_network.vnet2.name
 }
-
