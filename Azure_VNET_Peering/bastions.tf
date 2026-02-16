@@ -17,7 +17,7 @@ resource "azurerm_public_ip" "bastion_ip_vm2" {
 
 # Bastion Hosts
 resource "azurerm_bastion_host" "bastion_vm1" {
-  name                = "bastion-vm1"
+  name                = "bastion-vm-1"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 
@@ -29,7 +29,7 @@ resource "azurerm_bastion_host" "bastion_vm1" {
 }
 
 resource "azurerm_bastion_host" "bastion_vm2" {
-  name                = "bastion-vm2"
+  name                = "bastion-vm-2"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 
