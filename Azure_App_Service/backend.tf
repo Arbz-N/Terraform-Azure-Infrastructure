@@ -5,5 +5,5 @@ terraform {
     container_name       = "<TF_STATE_CONTAINER>"
     key                  = "dev.terraform.tfstate"
   }
-}
+
 
