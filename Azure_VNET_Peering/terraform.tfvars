@@ -73,7 +73,27 @@ vms = {
     nic_id      = azurerm_network_interface.nic_vm2.id
   }
 }
+vnets_subnet = {
+  vnet1_subnet = {
+    name = subnet
+    address_prefixes = "10.0.1.0/24"
+  }
+    vnet2_subnet = {
+    name = subnet
+    address_prefixes = "10.0.1.0/24"
+  }
+}
 
+bastion_subnet = {
+  for_vnet1 = {
+    name = "AzureBastionSubnet"
+    address_prefixes = "10.0.2.0/27"
+  }
+  for_vnet2 = {
+    name = "AzureBastionSubnet"
+    address_prefixes = "10.1.2.0/27"
+  }
+}
 # Infrastructure Configuration
 location            = "eastus"
 resource_group_name = "prod-web-infra-rg"
