@@ -8,15 +8,41 @@ variable "service_principal" {
   })
 }
 
-variable "vnet-1_details" {
+variable "vnets" {
+  description = "All VNETS Configurations"
   type = object({
     name = string
     address_space = string
   })
 }
-variable "vnet-2_details" {
-  type = object({
-    name = string
-    address_space = string
-  })
+
+variable "vms" {
+  description = "All VM configurations"
+  type = map(object({
+    name    = string
+    vm_size = string
+
+    image = object({
+      publisher = string
+      offer     = string
+      sku       = string
+      version   = string
+    })
+
+    storage = object({
+      name              = string
+      caching           = string
+      create_option     = string
+      managed_disk_type = string
+    })
+
+    os_profile = object({
+      computer_name  = string
+      admin_username = string
+      admin_password = string
+    })
+
+    environment = string
+    nic_id      = string
+  }))
 }
