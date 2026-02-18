@@ -71,3 +71,10 @@ variable "peering" {
     target = string
   }))
 }
+variable "nics" {
+  type = map(object({
+    ip_name                       = string
+    private_ip_address_allocation = string
+    subnet_key                    = string
+  }))
+}
