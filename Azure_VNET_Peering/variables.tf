@@ -59,3 +59,9 @@ variable "bastion_subnet" {
     address_prefixes = string
   })
 }
+variable "resource_group" {
+  type = object({
+    name     = string
+    location = string
+  })
+}
