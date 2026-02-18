@@ -111,3 +111,15 @@ peering = {
     target = "vnet1"
   }
 }
+nics = {
+  for_vm1 = {
+    ip_name                       = "ipconfig1"
+    private_ip_address_allocation = "Dynamic"
+    subnet_key                    = "vnet1_subnet"
+  }
+  for_vm2 = {
+    ip_name                       = "ipconfig2"
+    private_ip_address_allocation = "Dynamic"
+    subnet_key                    = "vnet2_subnet"
+  }
+}
