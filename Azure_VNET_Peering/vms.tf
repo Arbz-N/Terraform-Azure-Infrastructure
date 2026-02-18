@@ -1,71 +1,39 @@
-resource "azurerm_virtual_machine" "vm1" {
-  name                  = "vm1"
+resource "azurerm_virtual_machine" "vm" {
+  for_each = var.vms
+
+  name                  = each.value.name
   location              = azurerm_resource_group.rg.location
   resource_group_name   = azurerm_resource_group.rg.name
-  network_interface_ids = [azurerm_network_interface.nic_vm1.id]
-  vm_size               = "Standard_D2s_v3"
+  network_interface_ids = [each.value.nic_id]
+  vm_size               = each.value.vm_size
 
   delete_os_disk_on_termination = true
 
   storage_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
-    version   = "latest"
+    publisher = each.value.image.publisher
+    offer     = each.value.image.offer
+    sku       = each.value.image.sku
+    version   = each.value.image.version
   }
 
   storage_os_disk {
-    name              = "osdisk-vm1"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
+    name              = each.value.storage.name
+    caching           = each.value.storage.caching
+    create_option     = each.value.storage.create_option
+    managed_disk_type = each.value.storage.managed_disk_type
   }
 
   os_profile {
-    computer_name  = "vm1-host"
-    admin_username = "azureuser"
-    admin_password = "Password1234!"
+    computer_name  = each.value.os_profile.computer_name
+    admin_username = each.value.os_profile.admin_username
+    admin_password = each.value.os_profile.admin_password
   }
 
   os_profile_linux_config {
     disable_password_authentication = false
   }
 
-  tags = { environment = "dev" }
-}
-
-resource "azurerm_virtual_machine" "vm2" {
-  name                  = "vm2"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
-  network_interface_ids = [azurerm_network_interface.nic_vm2.id]
-  vm_size               = "Standard_D2s_v3"
-
-  delete_os_disk_on_termination = true
-
-  storage_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
-    version   = "latest"
+  tags = {
+    environment = each.value.environment
   }
-
-  storage_os_disk {
-    name              = "osdisk-vm2"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
-
-  os_profile {
-    computer_name  = "vm2-host"
-    admin_username = "azureuser"
-    admin_password = "Password1234!"
-  }
-
-  os_profile_linux_config {
-    disable_password_authentication = false
-  }
-
-  tags = { environment = "staging" }
 }
