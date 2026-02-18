@@ -1,11 +1,29 @@
+resource "azurerm_network_interface" "nics" {
+  for_each = var.nics
+
+  location            = azurerm_resource_group.rg.location
+  name                = each.key
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                          = each.value.ip_name
+    private_ip_address_allocation = each.value.private_ip_address_allocation
+    subnet_id                     = azurerm_subnet.vnets_subnet[each.value.subnet_key].id
+  }
+}
+
 resource "azurerm_virtual_machine" "vm" {
   for_each = var.vms
 
-  name                  = each.value.name
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
-  network_interface_ids = [each.value.nic_id]
-  vm_size               = each.value.vm_size
+  name                = each.value.name
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  vm_size             = each.value.vm_size
+
+  # ✅ Correct NIC reference
+  network_interface_ids = [
+    azurerm_network_interface.nics[each.value.nic_id].id
+  ]
 
   delete_os_disk_on_termination = true
 
