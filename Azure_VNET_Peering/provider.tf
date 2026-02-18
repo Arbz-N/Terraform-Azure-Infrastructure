@@ -1,4 +1,3 @@
-# Day 6/28 - Terraform File And Directory Structure Best Practices
 
 terraform {
   required_providers {
