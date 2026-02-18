@@ -1,19 +1,19 @@
 variable "service_principal" {
   description = "Azure Service Principal credentials"
-  type        = object({
+  type        = map(object({
     client_id       = string
     client_secret   = string
     tenant_id       = string
     subscription_id = string
-  })
+  }))
 }
 
 variable "vnets" {
   description = "All VNETS Configurations"
-  type = object({
+  type = map(object({
     name = string
     address_space = string
-  })
+  }))
 }
 
 variable "vms" {
@@ -48,20 +48,26 @@ variable "vms" {
 }
 
 variable "vnets_subnet" {
-  type = object({
+  type = map(object({
     name = string
     address_prefixes = string
-  })
+  }))
 }
 variable "bastion_subnet" {
-  type = object({
+  type = map(object({
     name = string
     address_prefixes = string
-  })
+  }))
 }
 variable "resource_group" {
-  type = object({
+  type = map(object({
     name     = string
     location = string
-  })
+  }))
+}
+variable "peering" {
+  type = map(object({
+    source = string
+    target = string
+  }))
 }
