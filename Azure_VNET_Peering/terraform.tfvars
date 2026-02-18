@@ -100,3 +100,14 @@ resource_group = {
   location = "Australia East"
 }
 
+peering = {
+  vnet1_to_vnet2 = {
+    source = "vnet1"
+    target = "vnet2"
+  }
+  vnet2_to_vnet1 = {
+
+    source = "vnet2"
+    target = "vnet1"
+  }
+}
