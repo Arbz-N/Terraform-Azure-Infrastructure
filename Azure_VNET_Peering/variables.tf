@@ -46,3 +46,16 @@ variable "vms" {
     nic_id      = string
   }))
 }
+
+variable "vnets_subnet" {
+  type = object({
+    name = string
+    address_prefixes = string
+  })
+}
+variable "bastion_subnet" {
+  type = object({
+    name = string
+    address_prefixes = string
+  })
+}
