@@ -94,9 +94,9 @@ bastion_subnet = {
     address_prefixes = "10.1.2.0/27"
   }
 }
-# Infrastructure Configuration
-location            = "eastus"
-resource_group_name = "prod-web-infra-rg"
-vm_size             = "Standard_B2s"
-admin_username      = "azureuser"
-ssh_public_key_path = "~/.ssh/azure_vm_key.pub"
+
+resource_group = {
+  name     = "practice-rg"
+  location = "Australia East"
+}
+
