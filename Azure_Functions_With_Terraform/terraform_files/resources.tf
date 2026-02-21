@@ -34,7 +34,7 @@ resource "azurerm_linux_function_app" "example" {
   storage_account_name       = azurerm_storage_account.example.name
   storage_account_access_key = azurerm_storage_account.example.primary_access_key
 
-  functions_extension_version = "~4"
+  functions_extension_version = var.func_details.functions_extension_version
 
   site_config {
     application_stack {
@@ -43,6 +43,6 @@ resource "azurerm_linux_function_app" "example" {
   }
 
   app_settings = {
-    WEBSITE_RUN_FROM_PACKAGE = "1"
+    WEBSITE_RUN_FROM_PACKAGE = var.func_details.WEBSITE_RUN_FROM_PACKAGE
   }
 }
