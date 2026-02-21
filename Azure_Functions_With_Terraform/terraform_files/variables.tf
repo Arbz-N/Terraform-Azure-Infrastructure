@@ -38,5 +38,7 @@ variable "func_details" {
   type = object({
     name = string
     node_version = string
+    functions_extension_version = string
+    WEBSITE_RUN_FROM_PACKAGE = string
   })
 }
