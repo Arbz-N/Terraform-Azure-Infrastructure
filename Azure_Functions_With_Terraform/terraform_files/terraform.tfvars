@@ -25,4 +25,6 @@ service_plan_details = {
 func_details = {
   name         = "<FUNCTION_APP_NAME>"
   node_version = "<NODE_VERSION>"
+  functions_extension_version = "~4"
+  WEBSITE_RUN_FROM_PACKAGE = "1"
 }
