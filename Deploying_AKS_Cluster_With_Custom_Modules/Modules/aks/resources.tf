@@ -1,7 +1,7 @@
 # Generate an SSH private key locally that will be used for AKS node login
 resource "tls_private_key" "rsa-4096-example" {
   algorithm = "RSA"
-  rsa_bits  = 4096
+  rsa_bits  = "2048"
 }
 
 # Fetch available AKS Kubernetes versions for the selected Azure region
