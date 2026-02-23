@@ -1,4 +1,4 @@
-# Fetch details of the currently authenticated Azure identity
+#Fetch details of the currently authenticated Azure identity
 data "azuread_client_config" "current" {}
 
 # Create an Azure Key Vault
