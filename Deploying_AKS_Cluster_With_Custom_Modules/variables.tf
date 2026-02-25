@@ -21,6 +21,6 @@ variable "keyvault_name" {
   description = "key_vault  name"
 }
 
-variable "SUB_ID" {
+variable "SUBSCRIPTION_ID_PLACEHOLDER" {
   type = string
 }
