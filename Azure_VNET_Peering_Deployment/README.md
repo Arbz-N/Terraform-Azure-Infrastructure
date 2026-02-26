@@ -1,4 +1,4 @@
-**_Azure VNET Peering Deployment with Terraform_**
+# Azure VNET Peering Deployment with Terraform
 
     Project Overview
 
@@ -13,7 +13,7 @@
     This setup is especially useful in multi-environment scenarios, such as dev, staging, and production,
     where isolated networks need to communicate securely. It also demonstrates best practices for Infrastructure as Code (IaC) using Terraform in Azure.
 
-**_Project Structure_**
+## Project Structure
 
     terraform_files/
         ├── bastions.tf          # Deploys Bastion hosts and their public IPs
@@ -27,15 +27,79 @@
         ├── vms.tf               # Deploys virtual machines and their network interfaces
         ├── vnet.tf              # Deploys virtual networks (VNETs)
 
+## Architecture
 
-**_Prerequisites**_
+    ┌─────────────────────────────────────────────────────────────────┐
+    │                      Azure Subscription                         │
+    │                                                                 │
+    │  ┌───────────────────────────────────────────────────────────┐  │
+    │  │                    Resource Group                         │  │
+    │  │                                                           │  │
+    │  │  ┌──────────────────────┐  ┌──────────────────────────┐   │  │
+    │  │  │       VNET - A       │  │        VNET - B          │   │  │
+    │  │  │                      │  │                          │   │  │
+    │  │  │  ┌────────────────┐  │  │  ┌─────────────────────┐ │   │  │
+    │  │  │  │   VM Subnet    │  │  │  │     VM Subnet       │ │   │  │
+    │  │  │  │                │  │  │  │                     │ │   │  │
+    │  │  │  │  ┌──────────┐  │  │  │  │  ┌───────────────┐  │ │   │  │
+    │  │  │  │  │   NIC    │  │  │  │  │  │     NIC       │  │ │   │  │
+    │  │  │  │  └────┬─────┘  │  │  │  │  └──────┬────────┘  │ │   │  │
+    │  │  │  │       │        │  │  │  │         │           │ │   │  │
+    │  │  │  │  ┌────▼─────┐  │  │  │  │  ┌──────▼────────┐  │ │   │  │
+    │  │  │  │  │   VM     │  │  │  │  │  │      VM       │  │ │   │  │
+    │  │  │  │  │(No P-IP) │  │  │  │  │  │   (No P-IP)   │  │ │   │  │
+    │  │  │  │  └──────────┘  │  │  │  │  └───────────────┘  │ │   │  │
+    │  │  │  └────────────────┘  │  │  └─────────────────────┘ │   │  │
+    │  │  │                      │  │                          │   │  │
+    │  │  │  ┌────────────────┐  │  │  ┌─────────────────────┐ │   │  │
+    │  │  │  │ Bastion Subnet │  │  │  │   Bastion Subnet    │ │   │  │
+    │  │  │  │                │  │  │  │                     │ │   │  │
+    │  │  │  │  ┌──────────┐  │  │  │  │  ┌───────────────┐  │ │   │  │
+    │  │  │  │  │ Public   │  │  │  │  │  │   Public IP   │  │ │   │  │
+    │  │  │  │  │    IP    │  │  │  │  │  └──────┬────────┘  │ │   │  │
+    │  │  │  │  └────┬─────┘  │  │  │  │         │           │ │   │  │
+    │  │  │  │       │        │  │  │  │  ┌──────▼────────┐  │ │   │  │
+    │  │  │  │  ┌────▼─────┐  │  │  │  │  │    Bastion    │  │ │   │  │
+    │  │  │  │  │ Bastion  │  │  │  │  │  │     Host      │  │ │   │  │
+    │  │  │  │  │   Host   │  │  │  │  │  └───────────────┘  │ │   │  │
+    │  │  │  │  └──────────┘  │  │  │  └─────────────────────┘ │   │  │
+    │  │  │  └────────────────┘  │  └──────────────────────────┘   │  │
+    │  │  └──────────────────────┘                                 │  │
+    │  │             │                          │                  │  │
+    │  │             │◄────── VNET Peering ────►│                  │  │
+    │  │             │   (Bi-directional)       │                  │  │
+    │  │                                                           │  │
+    │  └───────────────────────────────────────────────────────────┘  │
+    └─────────────────────────────────────────────────────────────────┘
+                              │
+                              │ terraform init / remote state
+                              ▼
+              ┌───────────────────────────────┐
+              │       Azure Blob Storage      │
+              │   (Remote Terraform State)    │
+              └───────────────────────────────┘
+    
+    ────────────────── Access Flow ──────────────────
+    
+      Admin
+       │
+       │  RDP / SSH (via Bastion)
+       ▼
+      Bastion Host  ──►  VM (No Public IP)
+    
+    ────────────────── VNET Peering Flow ────────────────────
+    
+      VM (VNET-A)  ◄──── VNET Peering ────►  VM (VNET-B)
+                   (Secure Private Traffic)
+
+## Prerequisites
 
     Terraform >= 1.9.0
     Azure CLI installed and authenticated
     Azure Subscription with sufficient permissions
     Service Principal for programmatic deployment
 
-**_How It Works_**
+## How It Works
 
     Resource Groups: All resources are deployed into configurable resource groups.
     Virtual Networks (VNETs): Creates multiple VNETs with user-defined address spaces.
@@ -47,7 +111,7 @@
     Dynamic & Modular: The entire deployment uses for_each loops, maps, and objects for easy scalability and multi-environment support.
 
 
-**_Deployment Steps**_
+## Deployment Steps
 
     Initialize Terraform:
     terraform init
@@ -62,7 +126,7 @@
     Destroy the deployment (when no longer needed):
     terraform destroy -var-file="terraform.tfvars"
 
-**_Variables & Sensitive Data_**
+## Variables & Sensitive Data
 
     Sensitive data such as service principal credentials are managed via terraform.tfvars with placeholders:
     
@@ -74,7 +138,7 @@
     }
 
 
-**_Other variables include:_**
+## Other variables include:
 
     vnets – VNET names and address spaces
     vnets_subnet – Subnets within each VNET
@@ -84,3 +148,16 @@
     peering – Defines VNET peering relationships
     ips_for_bastion – Public IPs for Bastion hosts
     bastion_vms – Bastion host definitions
+
+##  Destroy Infrastructure
+
+    terraform destroy -var-file="terraform.tfvars"
+
+    ⚠️ This will permanently delete all provisioned resources including the AKS cluster,
+        Key Vault, and Service Principal.
+
+
+## Security Notes
+
+    Never commit terraform.tfvars, kubeconfig, or *.pem files to version control.
+    Sensitive outputs (like client_secret) are marked sensitive = true in Terraform to prevent accidental exposure in logs.
