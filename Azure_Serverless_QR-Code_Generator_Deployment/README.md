@@ -1,4 +1,4 @@
-Azure Serverless QR Code Generator Deployment
+# Azure Serverless QR Code Generator Deployment
 
 ## Overview
 This Terraform project automates the deployment of a **serverless Azure Function App** that integrates with the **Azure QR Code Generator**.  
@@ -31,6 +31,63 @@ Before deploying this project, ensure you have the following:
 
 
 ---
+
+## Architecture
+
+    ┌─────────────────────────────────────────────────────────┐
+    │                   Azure Subscription                    │
+    │                                                         │
+    │  ┌───────────────────────────────────────────────────┐  │
+    │  │                  Resource Group                   │  │
+    │  │                                                   │  │
+    │  │  ┌─────────────────┐   ┌───────────────────────┐  │  │
+    │  │  │ Storage Account │   │     Service Plan      │  │  │
+    │  │  │  (Blob Storage) │   │     (Linux-based)     │  │  │
+    │  │  └────────┬────────┘   └──────────┬────────────┘  │  │
+    │  │           │                       │               │  │
+    │  │           └───────────┬───────────┘               │  │
+    │  │                       │                           │  │
+    │  │                       ▼                           │  │
+    │  │          ┌────────────────────────┐               │  │
+    │  │          │     Function App       │               │  │
+    │  │          │   (Node.js Runtime)    │               │  │
+    │  │          │                        │               │  │
+    │  │          │  ┌──────────────────┐  │               │  │
+    │  │          │  │ GenerateQRCode   │  │               │  │
+    │  │          │  │   (HTTP Trigger) │  │               │  │
+    │  │          │  └────────┬─────────┘  │               │  │
+    │  │          └───────────┼────────────┘               │  │
+    │  │                      │                            │  │
+    │  │                      │ Stores QR Image            │  │
+    │  │                      ▼                            │  │
+    │  │          ┌────────────────────────┐               │  │
+    │  │          │     Blob Container     │               │  │
+    │  │          │   (qrcode.png stored)  │               │  │
+    │  │          └────────────────────────┘               │  │
+    │  │                                                   │  │
+    │  └───────────────────────────────────────────────────┘  │
+    └─────────────────────────────────────────────────────────┘
+                              │
+                              │ terraform init / remote state
+                              ▼
+              ┌───────────────────────────────┐
+              │       Azure Blob Storage      │
+              │   (Remote Terraform State)    │
+              └───────────────────────────────┘
+    
+    ─────────────────── Request Flow ───────────────────
+    
+      User
+       │
+       │  GET /api/GenerateQRCode?url=https://example.com
+       ▼
+      Function App
+       │
+       ├──► Generate QR Code (Node.js)
+       │
+       └──► Upload to Blob Storage
+                  │
+                  └──► Return blobUrl to User
 
 ## Deployment & Usage
 
