@@ -1,21 +1,69 @@
-**Remote-StateFile-Setup-Using-ServicePrinciple**
+# Remote-StateFile-Setup-Using-ServicePrinciple
 
-Overview
+## Overview
 
     This project demonstrates how to configure a production-style Terraform workflow in Microsoft Azure using a Service Principal for authentication and Azure Blob Storage as a remote backend. 
     The approach follows Infrastructure as Code (IaC) and DevOps best practices by separating resource provisioning from state management and using non-human automation identities.
     The workflow ensures secure, centralized state storage and reproducible infrastructure deployment.
 
-Architecture Flow
+## Architecture
 
-    Service Principal → Provides Automation Authentication
-    Azure CLI / Terraform → Creates Backend Storage (Resource Group, Storage Account, Container)
-    Terraform → Deploys Infrastructure
-    Azure Blob Storage → Stores Terraform State File
+    ┌─────────────────────────────────────────────────────────┐
+    │                   Azure Subscription                    │
+    │                                                         │
+    │  ┌───────────────────────────────────────────────────┐  │
+    │  │            Backend Resource Group                 │  │
+    │  │                                                   │  │
+    │  │  ┌─────────────────────────────────────────────┐  │  │
+    │  │  │            Storage Account                  │  │  │
+    │  │  │                                             │  │  │
+    │  │  │       ┌─────────────────────────┐           │  │  │
+    │  │  │       │    Blob Container       │           │  │  │
+    │  │  │       │  (dev.terraform.tfstate)│           │  │  │
+    │  │  │       └─────────────────────────┘           │  │  │
+    │  │  └─────────────────────────────────────────────┘  │  │
+    │  └───────────────────────────────────────────────────┘  │
+    │                                                         │
+    │  ┌───────────────────────────────────────────────────┐  │
+    │  │                  Entra ID                         │  │
+    │  │                                                   │  │
+    │  │        ┌──────────────────────────┐               │  │
+    │  │        │     Service Principal    │               │  │
+    │  │        │  (Contributor Role)      │               │  │
+    │  │        └──────────────────────────┘               │  │
+    │  └───────────────────────────────────────────────────┘  │
+    └─────────────────────────────────────────────────────────┘
+    
+    ────────────────── Workflow Flow ──────────────────
+    
+      ┌─────────────────┐
+      │  Service        │
+      │  Principal      │──► Provides Authentication
+      └────────┬────────┘
+               │
+               ▼
+      ┌─────────────────┐
+      │  Azure CLI      │──► Creates Resource Group
+      │  (bash script)  │──► Creates Storage Account
+      └────────┬────────┘──► Creates Blob Container
+               │
+               ▼
+      ┌─────────────────┐
+      │    Terraform    │──► terraform init
+      │                 │──► terraform plan
+      │                 │──► terraform apply
+      └────────┬────────┘
+               │
+               │ Stores State
+               ▼
+      ┌─────────────────┐
+      │  Azure Blob     │
+      │  Storage        │──► dev.terraform.tfstate
+      └─────────────────┘
 
-Prerequisites
+## Prerequisites
 
-Before starting, ensure you have:
+### Before starting, ensure you have:
 
     Azure Subscription
     Azure CLI installed and logged in
@@ -26,7 +74,8 @@ Before starting, ensure you have:
     Resource Groups
     Storage Accounts
 
-Step 1 — Create Service Principal for Automation
+### Step 1 — Create Service Principal for Automation
+
 First, create a Service Principal that Terraform and scripts can use for authentication:
 
     az ad sp create-for-rbac -n az-demo --role="Contributor" --scopes="/subscriptions/<SUBSCRIPTION_ID>"
@@ -42,7 +91,7 @@ First, create a Service Principal that Terraform and scripts can use for authent
 
     Use these credentials in Terraform provider configuration.
 
-Step 2 — Create Remote State Storage (Using CLI or Terraform)
+### Step 2 — Create Remote State Storage (Using CLI or Terraform)
 
     Once the Service Principal exists, you can create backend resources:
 
@@ -69,7 +118,7 @@ Step 2 — Create Remote State Storage (Using CLI or Terraform)
     
     These resources will store Terraform’s state file securely in Azure.
 
-Step 3 — Terraform Provider Configuration
+### Step 3 — Terraform Provider Configuration
 
     Terraform uses the Service Principal credentials:
     
@@ -82,7 +131,7 @@ Step 3 — Terraform Provider Configuration
       tenant_id       = "<TENANT_ID>"
     }
 
-Step 4 — Remote Backend Configuration
+### Step 4 — Remote Backend Configuration
 
     Terraform state is stored remotely in Azure Blob Storage:
     
@@ -95,7 +144,7 @@ Step 4 — Remote Backend Configuration
       }
     }
 
-Benefits of This Setup
+### Benefits of This Setup
 
     Secure automation using Service Principals
     Centralized Terraform state management
@@ -103,7 +152,7 @@ Benefits of This Setup
     Reproducible infrastructure deployment
     Production-grade Terraform workflow
 
-Deployment Commands
+### Deployment Commands
 
     terraform init
     terraform plan
@@ -113,3 +162,4 @@ Deployment Commands
 Terraform state will now be securely stored in Azure Blob Storage.
 
 For practice/demo purposes only — make sure to delete this after use
+
