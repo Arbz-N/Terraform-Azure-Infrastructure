@@ -1,10 +1,10 @@
-**_Azure Production-Grade Auto-Scaling Web Infrastructure_**
+# Azure Production-Grade Auto-Scaling Web Infrastructure
 
     Overview
     This project provides a production-ready, auto-scaling web infrastructure on Microsoft Azure, fully automated using Terraform. 
     It implements industry best practices for high availability, security, and operational excellence, making it ideal for deploying scalable web applications in enterprise environments.
 
-_**Repository Structure**_
+## Repository Structure
 
     Azure-Production-AutoScaling-WebInfra/
     │
@@ -21,8 +21,81 @@ _**Repository Structure**_
     │
     └── README.md
 
+## Architecture
 
-**_What You'll Deploy**_
+    ┌─────────────────────────────────────────────────────────────────┐
+    │                      Azure Subscription                         │
+    │                                                                 │
+    │  ┌───────────────────────────────────────────────────────────┐  │
+    │  │                     Resource Group                        │  │
+    │  │                                                           │  │
+    │  │  ┌─────────────────────────────────────────────────────┐  │  │
+    │  │  │                Virtual Network (VNet)               │  │  │
+    │  │  │                                                     │  │  │
+    │  │  │   ┌─────────────────────────────────────────────┐   │  │  │
+    │  │  │   │                Public Subnet                │   │  │  │
+    │  │  │   │                                             │   │  │  │
+    │  │  │   │   Internet                                  │   │  │  │
+    │  │  │   │      │                                      │   │  │  │
+    │  │  │   │      ▼                                      │   │  │  │
+    │  │  │   │  ┌───────────────────┐                      │   │  │  │
+    │  │  │   │  │   Azure Load      │                      │   │  │  │
+    │  │  │   │  │   Balancer        │                      │   │  │  │
+    │  │  │   │  │  (Public IP)      │                      │   │  │  │
+    │  │  │   │  └────────┬──────────┘                      │   │  │  │
+    │  │  │   │           │  Health Probe                   │   │  │  │
+    │  │  │   └───────────┼─────────────────────────────────┘   │  │  │
+    │  │  │               │                                     │  │  │
+    │  │  │   ┌───────────┼─────────────────────────────────┐   │  │  │
+    │  │  │   │           │       Private Subnet            │   │  │  │
+    │  │  │   │           ▼                                 │   │  │  │
+    │  │  │   │  ┌─────────────────────────────────────┐    │   │  │  │
+    │  │  │   │  │   Virtual Machine Scale Set (VMSS)  │    │   │  │  │
+    │  │  │   │  │                                     │    │   │  │  │
+    │  │  │   │  │   ┌────────┐ ┌────────┐ ┌────────┐  │    │   │  │  │
+    │  │  │   │  │   │  VM 1  │ │  VM 2  │ │  VM n  │  │    │   │  │  │
+    │  │  │   │  │   │(No PIP)│ │(No PIP)│ │(No PIP)│  │    │   │  │  │
+    │  │  │   │  │   └────────┘ └────────┘ └────────┘  │    │   │  │  │
+    │  │  │   │  │       Apache + PHP (user_data.sh)   │    │   │  │  │
+    │  │  │   │  └──────────────────┬──────────────────┘    │   │  │  │
+    │  │  │   │                     │                       │   │  │  │
+    │  │  │   │  ┌──────────────────┴──────────────────┐    │   │  │  │
+    │  │  │   │  │         Azure Monitor               │    │   │  │  │
+    │  │  │   │  │         Autoscale                   │    │   │  │  │
+    │  │  │   │  │  CPU > 70%  →  Scale Out            │    │   │  │  │
+    │  │  │   │  │  CPU < 10%  →  Scale In             │    │   │  │  │
+    │  │  │   │  └─────────────────────────────────────┘    │   │  │  │
+    │  │  │   │                     │                       │   │  │  │
+    │  │  │   │  ┌──────────────────┴──────────────────┐    │   │  │  │
+    │  │  │   │  │           NAT Gateway               │    │   │  │  │
+    │  │  │   │  │     (Secure Outbound Traffic)       │    │   │  │  │
+    │  │  │   │  └─────────────────────────────────────┘    │   │  │  │
+    │  │  │   │                     │                       │   │  │  │
+    │  │  │   │  ┌──────────────────┴──────────────────┐    │   │  │  │
+    │  │  │   │  │                NSG                  │    │   │  │  │
+    │  │  │   │  │   Allow: HTTP(80) · HTTPS(443)      │    │   │  │  │
+    │  │  │   │  │   Deny : Direct Internet to VMs     │    │   │  │  │
+    │  │  │   │  └─────────────────────────────────────┘    │   │  │  │
+    │  │  │   └─────────────────────────────────────────────┘   │  │  │
+    │  │  └─────────────────────────────────────────────────────┘  │  │
+    │  └───────────────────────────────────────────────────────────┘  │
+    └─────────────────────────────────────────────────────────────────┘
+    
+                                   │
+                                   ▼
+                  ┌────────────────────────────────┐
+                  │       Azure Blob Storage       │
+                  │    (Remote Terraform State)    │
+                  └────────────────────────────────┘
+    
+    ──────────────────── Traffic Flow ────────────────────
+    
+      Internet ──► Load Balancer ──► VMSS (VMs)
+                                        │
+                                        └──► NAT Gateway ──► Internet
+                                             (Outbound only)
+
+## What You'll Deploy
 
     Virtual Network (VNet) with isolated subnets
     Azure Load Balancer for traffic distribution
@@ -32,7 +105,7 @@ _**Repository Structure**_
     Azure Monitor Autoscale for dynamic resource adjustment
     Remote state management via Azure Blob Storage
 
-**_Prerequisites**_
+## Prerequisites
 
     Before deployment:
     Azure Subscription
@@ -41,7 +114,7 @@ _**Repository Structure**_
     Service Principal with Contributor role
     SSH Key pair
 
-**_Deployment Steps**_
+## Deployment Steps
 
     1 Generate SSH Key
     ssh-keygen -t rsa -b 4096 -f ~/.ssh/azure_vm_key 
@@ -77,9 +150,10 @@ _**Repository Structure**_
     Access your application:
     http://<lb_ip>/index.php
 
-**_Key Features**_
+## Key Features
     
       Feature                                                 Description
+
     High Availability                      Multi-instance deployment across availability zones
     Auto-Scaling                           Dynamic scaling based on CPU metrics (70% scale-out, 10% scale-in)
     Security First                         Zero public IPs on VMs, NSG-controlled traffic, NAT-based outbound
@@ -89,7 +163,7 @@ _**Repository Structure**_
     Cost Optimized                         Scale-in capabilities reduce costs during low traffic
     Production Ready                       Service Principal authentication, remote state, modular design
 
-**_Architecture Highlights**_
+## Architecture Highlights
 
     Single Entry Point: All traffic flows through Azure Load Balancer
     Private VM Instances: No direct internet exposure
@@ -97,7 +171,7 @@ _**Repository Structure**_
     Dynamic Scaling: Azure Monitor adjusts VM count based on demand
     Health Monitoring: Continuous health probes ensure traffic goes to healthy instances only
     
-_**What This Project Demonstrates**_
+## What This Project Demonstrates
 
     Production-grade Azure architecture
     Secure networking
@@ -107,6 +181,19 @@ _**What This Project Demonstrates**_
     Cloud security best practices
 
 
+
+## Destroy Infrastructure
+
+    terraform destroy -var-file="terraform.tfvars"
+
+    ⚠️ This will permanently delete all provisioned resources including the AKS cluster,
+        Key Vault, and Service Principal.
+
+
+## Security Notes
+
+    Never commit terraform.tfvars, kubeconfig, or *.pem files to version control.
+    Sensitive outputs (like client_secret) are marked sensitive = true in Terraform to prevent accidental exposure in logs.
 
     
     
