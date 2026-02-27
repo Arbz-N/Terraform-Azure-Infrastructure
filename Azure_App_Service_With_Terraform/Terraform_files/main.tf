@@ -37,14 +37,14 @@ resource "azurerm_app_service_source_control" "scm" {
   app_id   = azurerm_linux_web_app.as.id
   repo_url = "https://github.com/Arbz-N/Simple_Testing_App.git"
   branch   = "master"
-  use_manual_integration = true
+  use_manual_integration = false
 }
 
 resource "azurerm_app_service_source_control_slot" "scm1" {
   slot_id   = azurerm_linux_web_app_slot.slot.id
   repo_url = "https://github.com/Arbz-N/Simple_Testing_App.git"
   branch   = "staging"
-  use_manual_integration = true
+  use_manual_integration = false
 }
 
 resource "azurerm_web_app_active_slot" "active" {
